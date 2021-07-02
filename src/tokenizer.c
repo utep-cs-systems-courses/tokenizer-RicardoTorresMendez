@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "tokenizer.h"
 
 /* Return true (non-zero) if c is a whitespace characer
@@ -35,7 +36,7 @@ int non_space_char(char c){
 
 char *word_start(char *str){
   char *p = str;
-  while( space_char( *p ) && *p != '\0' ){
+  while( space_char( *p ) && ( (*p != '\0') && (*p != '\n') )  ){
     p = p + 1;
   }
   return p;
@@ -47,7 +48,7 @@ char *word_start(char *str){
 
 char *word_terminator(char *word){
   char *p = word;
-  while( non_space_char( *p ) && *p != '\0' ){
+  while( non_space_char( *p ) && ( (*p != '\0') && (*p != '\n') ) ){
     p = p + 1;
   }
   return p;
@@ -60,13 +61,11 @@ char *word_terminator(char *word){
 int count_words(char *str){
   char *p = str;
   short count = 0;
-
+  
   p = word_start(p);
-  for(count = 0; *p != '\0'; count++){
-    p = word_start( p );
-    if( *p == '\0' ){ return count; }
+  for(count = 0; ( ( *p != '\0' ) && (*p != '\n') ); count++){
     p = word_terminator( p );
-    
+    p = word_start( p );
   }
   return count;
 }
@@ -76,7 +75,16 @@ int count_words(char *str){
    containing <len> chars from <inStr> */
 
 char *copy_str(char *inStr, short len){
-
+  //we add 1 to account for the escape character
+  char *str_copy = (char*) malloc( len + 1 );
+  for(int i=0; i<len; i++){
+    *str_copy = *inStr;
+    str_copy++;
+    inStr++;
+  }
+  *str_copy = '\0';
+  str_copy = str_copy - len;
+  return str_copy;
 }
 
 
@@ -98,7 +106,19 @@ char *copy_str(char *inStr, short len){
 */
 
 char **tokenize(char* str){
-
+  short length = count_words( str );
+  //add 1 to length to account for escape character
+  char **tokens = (char**) malloc( ( length + 1 ) * sizeof( char* ) );
+  char *str_old;
+  str = word_star(str);
+  for(int i=0; i<length; i++){
+    str_old = str;
+    *tokens = copy_str( str_old, ( str = word_terminator(str_old) ) - str_old );
+    str = word_star(str);
+    tokens++;
+  }
+  *tokens = 0;
+  return tokens - length;
 }
 
 
@@ -106,7 +126,11 @@ char **tokenize(char* str){
 /* Prints all tokens. */
 
 void print_tokens(char **tokens){
-
+  while( *tokens != 0 ){
+    printf("%s", *tokens);
+    printf("%s", "\n");
+    tokens++;
+  }
 }
 
 
@@ -114,7 +138,11 @@ void print_tokens(char **tokens){
 /* Frees all tokens and the vector containing themx. */
 
 void free_tokens(char **tokens){
-
+  while( *tokens != 0 ){
+    free( *tokens );
+    tokens++;
+  }
+  free(tokens);
 }
 
 
