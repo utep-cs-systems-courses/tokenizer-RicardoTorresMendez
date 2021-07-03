@@ -110,11 +110,11 @@ char **tokenize(char* str){
   //add 1 to length to account for escape character
   char **tokens = (char**) malloc( ( length + 1 ) * sizeof( char* ) );
   char *str_old;
-  str = word_star(str);
+  str = word_start(str);
   for(int i=0; i<length; i++){
     str_old = str;
     *tokens = copy_str( str_old, ( str = word_terminator(str_old) ) - str_old );
-    str = word_star(str);
+    str = word_start(str);
     tokens++;
   }
   *tokens = 0;
