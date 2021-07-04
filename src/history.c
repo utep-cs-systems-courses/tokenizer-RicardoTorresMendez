@@ -25,7 +25,7 @@ List* init_history(){
 
 void add_history(List *list, char *str){
   //create the new item to contain the string
-  Item *item = malloc( sizeof( Item ) );
+  Item *item = (Item*) malloc( sizeof( Item ) );
   item->str = str;
   item->next = NULL;
 
@@ -84,9 +84,8 @@ void free_history(List *list){
   Item *temp;
   while( list->root != NULL ){
     temp = list->root;
-    list->root = list-root->next;
+    list->root = list->root->next;
     free(temp);
   }
-  free(list);
 }
 
